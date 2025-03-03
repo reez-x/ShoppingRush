@@ -11,11 +11,14 @@ public class XPLevelManager : MonoBehaviour
     public int maxXP = 50;  // XP maksimal untuk naik level
     public int currentLevel = 0;  // Level saat ini
     public float xpBarSpeed = 0.5f;  // Kecepatan bar bertambah (smooth animation)
+    
+    public GroceryListManager groceryListManager;  // Referensi ke GroceryListManager
 
     // Update level UI dan XP
     void Start()
     {
         UpdateLevelUI();
+        UpdateItemCountForLevel();  // Update itemCount untuk level 0 pada awal permainan
     }
 
     // Fungsi untuk menambah XP
@@ -57,13 +60,24 @@ public class XPLevelManager : MonoBehaviour
         UpdateLevelUI();
         Debug.Log("Level Up! New Level: " + currentLevel);
 
-        // Setiap level up, bisa meningkatkan kesulitan atau menambah jumlah item di grocery list
+        // Update itemCount di GroceryListManager berdasarkan level
+        UpdateItemCountForLevel();
     }
 
     // Update UI level
     void UpdateLevelUI()
     {
         levelText.text = "Level: " + currentLevel.ToString();
+    }
+
+    // Update itemCount di GroceryListManager berdasarkan level
+    private void UpdateItemCountForLevel()
+    {
+        if (groceryListManager != null)
+        {
+            groceryListManager.itemCount = 2 + currentLevel;  // Mulai dari 2 pada level 0, dan bertambah 1 setiap level
+            Debug.Log("Item Count updated to: " + groceryListManager.itemCount);
+        }
     }
 
     // Fungsi untuk mendapatkan level saat ini

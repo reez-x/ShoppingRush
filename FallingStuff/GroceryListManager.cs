@@ -15,43 +15,46 @@ public class GroceryListManager : MonoBehaviour
     public XPLevelManager xpLevelManager;  // Referensi ke XPLevelManager (Pastikan ini sudah ditambahkan di Inspector)
 
     void Start()
+{
+    // Generate grocery list secara acak dan tampilkan di UI
+    GenerateGroceryList();
+    UpdateGroceryListUI();
+    UpdateScoreUI();  // Memperbarui UI untuk skor saat pertama kali dijalankan
+}
+
+void GenerateGroceryList()
+{
+    // Menghitung itemCount berdasarkan level saat ini
+    itemCount = 2 + xpLevelManager.GetCurrentLevel();  // Mulai dari 2 item pada level 0, dan bertambah 1 setiap level
+
+    // Ambil semua prefab di folder Resources/Prefabs
+    Object[] items = Resources.LoadAll("Prefabs", typeof(GameObject));  // Muat semua prefab dari folder Prefabs
+
+    groceryList.Clear();  // Kosongkan grocery list sebelumnya
+
+    // Pilih itemCount item acak dari prefab yang ada di folder
+    for (int i = 0; i < itemCount; i++)
     {
-        // Generate grocery list secara acak dan tampilkan di UI
-        GenerateGroceryList();
-        UpdateGroceryListUI();
-        UpdateScoreUI();  // Memperbarui UI untuk skor saat pertama kali dijalankan
-    }
+        // Pilih item acak dari array prefab yang dimuat
+        GameObject randomItem = (GameObject)items[Random.Range(0, items.Length)];
+        string itemName = randomItem.name;
 
-    // Meng-generate grocery list secara acak (mengambil itemCount item dari prefab di Resources/Prefabs)
-    void GenerateGroceryList()
-    {
-        // Ambil semua prefab di folder Resources/Prefabs
-        Object[] items = Resources.LoadAll("Prefabs", typeof(GameObject));  // Muat semua prefab dari folder Prefabs
-
-        groceryList.Clear();  // Kosongkan grocery list sebelumnya
-
-        // Pilih itemCount item acak dari prefab yang ada di folder
-        for (int i = 0; i < itemCount; i++)
+        // Pastikan item yang sama tidak ditambahkan lagi ke dalam grocery list
+        if (!groceryList.Contains(itemName))  
         {
-            // Pilih item acak dari array prefab yang dimuat
-            GameObject randomItem = (GameObject)items[Random.Range(0, items.Length)];
-            string itemName = randomItem.name;
-
-            // Pastikan item yang sama tidak ditambahkan lagi ke dalam grocery list
-            if (!groceryList.Contains(itemName))  
-            {
-                groceryList.Add(itemName);  // Simpan nama item (misalnya: apple, banana)
-            }
-            else
-            {
-                // Jika item sudah ada, kurangi i agar jumlah item tetap sesuai dengan itemCount
-                i--;
-            }
+            groceryList.Add(itemName);  // Simpan nama item (misalnya: apple, banana)
         }
-
-        // Debug: Tampilkan grocery list yang tergenerate ke console dalam satu log
-        Debug.Log("Grocery List Generated: " + GetGroceryListString());
+        else
+        {
+            // Jika item sudah ada, kurangi i agar jumlah item tetap sesuai dengan itemCount
+            i--;
+        }
     }
+
+    // Debug: Tampilkan grocery list yang tergenerate ke console dalam satu log
+    Debug.Log("Grocery List Generated: " + GetGroceryListString());
+}
+
 
     // Fungsi untuk menggabungkan seluruh grocery list menjadi satu string
     string GetGroceryListString()
