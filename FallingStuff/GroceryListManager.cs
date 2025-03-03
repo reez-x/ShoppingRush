@@ -12,6 +12,8 @@ public class GroceryListManager : MonoBehaviour
     private List<string> groceryList = new List<string>();  // Daftar grocery list
     private List<string> capturedItems = new List<string>();  // Daftar item yang sudah ditangkap
 
+    public XPLevelManager xpLevelManager;  // Referensi ke XPLevelManager (Pastikan ini sudah ditambahkan di Inspector)
+
     void Start()
     {
         // Generate grocery list secara acak dan tampilkan di UI
@@ -139,7 +141,11 @@ public class GroceryListManager : MonoBehaviour
         if (capturedItems.Count == groceryList.Count)
         {
             Debug.Log("Semua item telah diambil, generate grocery list baru!");
-            GenerateGroceryList();  // Generate list baru
+            // Tambahkan XP setelah grocery list selesai
+            xpLevelManager.AddXP(10);  // Menambah XP, bisa sesuaikan dengan jumlah XP yang diinginkan
+
+            // Generate list baru dan reset captured items
+            GenerateGroceryList();  
             capturedItems.Clear();  // Reset captured items
             UpdateGroceryListUI();  // Update UI dengan grocery list yang baru
         }
