@@ -124,7 +124,8 @@ public class RandomItemSpawner : MonoBehaviour
 {
     public string folderPath = "Prefabs/"; // Path folder dalam Resources tanpa "Assets/Resources"
     public float spawnHeight = 10f; // Ketinggian spawn untuk objek yang jatuh
-    public float spawnInterval = 2f; // Interval waktu antar spawn
+    public float minSpawnInterval = 1f; // Interval waktu spawn minimum
+    public float maxSpawnInterval = 3f; // Interval waktu spawn maksimum
     public Vector3 itemScale = new Vector3(0.5f, 0.5f, 0.5f); // Faktor skala yang ingin diterapkan pada objek yang jatuh
 
     private List<GameObject> itemPrefabs = new List<GameObject>(); // Daftar prefab yang ditemukan
@@ -170,32 +171,39 @@ public class RandomItemSpawner : MonoBehaviour
     {
         while (true)
         {
-            // Pilih prefab dengan probabilitas lebih besar pada item yang ada di grocery list
-            GameObject itemToSpawn = GetItemToSpawn();
+            // Tentukan jumlah item yang akan spawn sekaligus (random antara 1 sampai 3 item)
+            int itemsToSpawn = Random.Range(1, 4);
 
-            if (itemToSpawn == null)
+            for (int i = 0; i < itemsToSpawn; i++)
             {
-                yield break; // Jika tidak ada item untuk spawn, berhenti
+                // Pilih prefab dengan probabilitas lebih besar pada item yang ada di grocery list
+                GameObject itemToSpawn = GetItemToSpawn();
+
+                if (itemToSpawn == null)
+                {
+                    yield break; // Jika tidak ada item untuk spawn, berhenti
+                }
+
+                // Tentukan posisi spawn secara acak
+                float randomX = Random.Range(-5f, 5f); // Rentang X acak
+                Vector3 spawnPosition = new Vector3(randomX, spawnHeight, 0);
+
+                // Spawn item dan beri Rigidbody2D agar bisa jatuh
+                GameObject spawnedItem = Instantiate(itemToSpawn, spawnPosition, Quaternion.identity);
+
+                // Tambahkan Rigidbody2D jika belum ada
+                if (spawnedItem.GetComponent<Rigidbody2D>() == null)
+                {
+                    spawnedItem.AddComponent<Rigidbody2D>();
+                }
+
+                // Set scale (ukurannya) menjadi lebih kecil
+                spawnedItem.transform.localScale = itemScale;  // Mengatur skala objek yang baru di-spawn
             }
 
-            // Tentukan posisi spawn secara acak
-            float randomX = Random.Range(-5f, 5f); // Rentang X acak
-            Vector3 spawnPosition = new Vector3(randomX, spawnHeight, 0);
-
-            // Spawn item dan beri Rigidbody2D agar bisa jatuh
-            GameObject spawnedItem = Instantiate(itemToSpawn, spawnPosition, Quaternion.identity);
-
-            // Tambahkan Rigidbody2D jika belum ada
-            if (spawnedItem.GetComponent<Rigidbody2D>() == null)
-            {
-                spawnedItem.AddComponent<Rigidbody2D>();
-            }
-
-            // Set scale (ukurannya) menjadi lebih kecil
-            spawnedItem.transform.localScale = itemScale;  // Mengatur skala objek yang baru di-spawn
-
-            // Tunggu beberapa detik sebelum spawn item berikutnya
-            yield return new WaitForSeconds(spawnInterval);
+            // Tentukan interval waktu acak antara spawn item berikutnya
+            float randomInterval = Random.Range(minSpawnInterval, maxSpawnInterval);
+            yield return new WaitForSeconds(randomInterval);
         }
     }
 
