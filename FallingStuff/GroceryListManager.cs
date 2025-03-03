@@ -134,6 +134,15 @@ public class GroceryListManager : MonoBehaviour
 
         // Update UI setelah item ditandai
         UpdateGroceryListUI();
+
+        // Cek apakah semua item telah ditangkap, jika ya, generate grocery list baru
+        if (capturedItems.Count == groceryList.Count)
+        {
+            Debug.Log("Semua item telah diambil, generate grocery list baru!");
+            GenerateGroceryList();  // Generate list baru
+            capturedItems.Clear();  // Reset captured items
+            UpdateGroceryListUI();  // Update UI dengan grocery list yang baru
+        }
     }
 
     // Fungsi untuk mengecek apakah item sudah dicoret dari grocery list
