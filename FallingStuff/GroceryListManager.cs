@@ -73,7 +73,7 @@ public class GroceryListManager : MonoBehaviour
         return string.Join(" | ", displayList);
     }
 
-    // Mengupdate UI grocery list dengan menambahkan "(captured)" pada item yang sudah diambil
+    // Mengupdate UI grocery list dengan menambahkan strikethrough pada item yang sudah diambil
     void UpdateGroceryListUI()
     {
         groceryListText.text = "";  // Bersihkan teks grocery list sebelumnya
@@ -81,8 +81,8 @@ public class GroceryListManager : MonoBehaviour
         {
             if (capturedItems.Contains(item))
             {
-                // Menambahkan "(captured)" jika item sudah diambil
-                groceryListText.text += item + " (captured)\n";
+                // Menambahkan strikethrough jika item sudah diambil
+                groceryListText.text += "<s>" + item + "</s>\n";
             }
             else
             {
