@@ -46,9 +46,34 @@ public class GroceryListManager : MonoBehaviour
                 i--;
             }
         }
+
+        // Debug: Tampilkan grocery list yang tergenerate ke console dalam satu log
+        Debug.Log("Grocery List Generated: " + GetGroceryListString());
     }
 
-    // Mengupdate UI grocery list dengan menambahkan strikethrough pada item yang sudah diambil
+    // Fungsi untuk menggabungkan seluruh grocery list menjadi satu string
+    string GetGroceryListString()
+    {
+        List<string> displayList = new List<string>();
+
+        foreach (string item in groceryList)
+        {
+            if (capturedItems.Contains(item))
+            {
+                // Menambahkan "(captured)" pada item yang sudah diambil
+                displayList.Add(item + " (captured)");
+            }
+            else
+            {
+                displayList.Add(item);
+            }
+        }
+
+        // Gabungkan seluruh item menjadi satu string yang dipisahkan dengan "|"
+        return string.Join(" | ", displayList);
+    }
+
+    // Mengupdate UI grocery list dengan menambahkan "(captured)" pada item yang sudah diambil
     void UpdateGroceryListUI()
     {
         groceryListText.text = "";  // Bersihkan teks grocery list sebelumnya
@@ -56,14 +81,17 @@ public class GroceryListManager : MonoBehaviour
         {
             if (capturedItems.Contains(item))
             {
-                // Menambahkan strikethrough jika item sudah diambil
-                groceryListText.text += "<s>" + item + "</s>\n";
+                // Menambahkan "(captured)" jika item sudah diambil
+                groceryListText.text += item + " (captured)\n";
             }
             else
             {
                 groceryListText.text += item + "\n";
             }
         }
+
+        // Debug: Update grocery list di konsol setelah ada item yang dicoret
+        Debug.Log("Grocery List Updated: " + GetGroceryListString());
     }
 
     // Mengupdate UI skor
@@ -101,6 +129,7 @@ public class GroceryListManager : MonoBehaviour
         if (!capturedItems.Contains(itemName))
         {
             capturedItems.Add(itemName);
+            Debug.Log("Item captured: " + itemName);  // Debug: Menampilkan item yang dicoret di konsol
         }
 
         // Update UI setelah item ditandai
