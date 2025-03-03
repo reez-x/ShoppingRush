@@ -134,6 +134,16 @@ public class RandomItemSpawner : MonoBehaviour
     [Range(1, 10)]  // Membuat slider antara 1 hingga 10 yang dapat diatur dari Unity Inspector
     public int groceryItemSpawnFrequency = 7;  // Semakin besar angka, semakin sering item grocery list muncul (1-10)
 
+    // New customizable parameters for fall speed and gravity
+    [Header("Item Fall Settings")]
+    [Range(0, 10)] public float gravityScale = 2f;  // Skala gravitasi yang bisa disesuaikan di Inspector
+    [Range(0f, 10f)] public float minFallSpeed = 3f;  // Kecepatan jatuh minimum
+    [Range(0f, 11f)] public float maxFallSpeed = 8f;  // Kecepatan jatuh maksimum
+    [Range(1, 5)] public float minSpawnAmount = 1f;  // Jumlah item minimum yang akan muncul secara bersamaan
+    [Range(1, 5)] public float maxSpawnAmount = 3f;  // Jumlah item maksimum yang akan muncul secara bersamaan
+
+    private Vector3 lastSpawnPosition; // Menyimpan posisi spawn terakhir
+
     void Start()
     {
         // Mengambil semua prefab yang ada di folder
@@ -171,8 +181,8 @@ public class RandomItemSpawner : MonoBehaviour
     {
         while (true)
         {
-            // Tentukan jumlah item yang akan spawn sekaligus (random antara 1 sampai 3 item)
-            int itemsToSpawn = Random.Range(1, 4);
+            // Tentukan jumlah item yang akan spawn sekaligus (random antara 1 sampai maxSpawnAmount)
+            int itemsToSpawn = Mathf.RoundToInt(Random.Range(minSpawnAmount, maxSpawnAmount));
 
             for (int i = 0; i < itemsToSpawn; i++)
             {
@@ -184,21 +194,33 @@ public class RandomItemSpawner : MonoBehaviour
                     yield break; // Jika tidak ada item untuk spawn, berhenti
                 }
 
-                // Tentukan posisi spawn secara acak
-                float randomX = Random.Range(-5f, 5f); // Rentang X acak
-                Vector3 spawnPosition = new Vector3(randomX, spawnHeight, 0);
+                // Tentukan posisi spawn secara acak, pastikan tidak terlalu dekat dengan posisi spawn sebelumnya
+                Vector3 spawnPosition = GetRandomSpawnPosition();
 
                 // Spawn item dan beri Rigidbody2D agar bisa jatuh
                 GameObject spawnedItem = Instantiate(itemToSpawn, spawnPosition, Quaternion.identity);
 
                 // Tambahkan Rigidbody2D jika belum ada
-                if (spawnedItem.GetComponent<Rigidbody2D>() == null)
+                Rigidbody2D rb = spawnedItem.GetComponent<Rigidbody2D>();
+                if (rb == null)
                 {
-                    spawnedItem.AddComponent<Rigidbody2D>();
+                    rb = spawnedItem.AddComponent<Rigidbody2D>();
                 }
+
+                // Atur properti Rigidbody2D untuk memastikan item jatuh dengan kecepatan yang tidak terlalu cepat
+                rb.gravityScale = gravityScale;  // Menetapkan skala gravitasi yang disesuaikan melalui Inspector
+                rb.drag = 0f;  // Pastikan drag (gesekan udara) 0 agar tidak menghambat kecepatan jatuh
+                rb.angularDrag = 0f;  // Pastikan angular drag (gesekan rotasi) 0 agar objek tidak melambat saat berputar
+
+                // Berikan kecepatan awal pada item agar jatuh dengan lebih cepat
+                float fallSpeed = Random.Range(minFallSpeed, maxFallSpeed); // Kecepatan jatuh antara min dan max yang disesuaikan di Inspector
+                rb.velocity = new Vector2(0, -fallSpeed); // Kecepatan jatuh langsung pada sumbu Y
 
                 // Set scale (ukurannya) menjadi lebih kecil
                 spawnedItem.transform.localScale = itemScale;  // Mengatur skala objek yang baru di-spawn
+
+                // Menyimpan posisi spawn terakhir
+                lastSpawnPosition = spawnPosition;
             }
 
             // Tentukan interval waktu acak antara spawn item berikutnya
@@ -241,5 +263,29 @@ public class RandomItemSpawner : MonoBehaviour
             }
         }
     }
-}
 
+    // Fungsi untuk mendapatkan posisi spawn yang acak dan cukup jauh dari spawn sebelumnya
+    Vector3 GetRandomSpawnPosition()
+    {
+        Vector3 newSpawnPosition = new Vector3();
+        bool positionIsValid = false;
+
+        // Tentukan batas minimal jarak spawn agar tidak tumpang tindih
+        float minDistance = 2f;  // Set jarak minimum antara spawn yang baru dan spawn sebelumnya
+
+        // Pastikan posisi spawn baru cukup jauh dari posisi sebelumnya
+        while (!positionIsValid)
+        {
+            float randomX = Random.Range(-5f, 5f); // Rentang X acak
+            newSpawnPosition = new Vector3(randomX, spawnHeight, 0);
+
+            // Periksa apakah jaraknya cukup jauh dari spawn sebelumnya
+            if (Vector3.Distance(newSpawnPosition, lastSpawnPosition) > minDistance)
+            {
+                positionIsValid = true;
+            }
+        }
+
+        return newSpawnPosition;
+    }
+}
