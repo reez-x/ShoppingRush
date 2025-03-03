@@ -8,6 +8,7 @@ public class GroceryListManager : MonoBehaviour
     public TextMeshProUGUI groceryListText;  // Referensi untuk grocery list UI
     public TextMeshProUGUI scoreText;  // Referensi untuk skor UI
     public int score = 0;  // Skor pemain
+    public int itemCount = 3;  // Jumlah item yang akan tergenerate di grocery list, bisa diatur lewat Inspector
     private List<string> groceryList = new List<string>();  // Daftar grocery list
     private List<string> capturedItems = new List<string>();  // Daftar item yang sudah ditangkap
 
@@ -19,7 +20,7 @@ public class GroceryListManager : MonoBehaviour
         UpdateScoreUI();  // Memperbarui UI untuk skor saat pertama kali dijalankan
     }
 
-    // Meng-generate grocery list secara acak (mengambil 3 item dari prefab di Resources/Prefabs)
+    // Meng-generate grocery list secara acak (mengambil itemCount item dari prefab di Resources/Prefabs)
     void GenerateGroceryList()
     {
         // Ambil semua prefab di folder Resources/Prefabs
@@ -27,19 +28,30 @@ public class GroceryListManager : MonoBehaviour
 
         groceryList.Clear();  // Kosongkan grocery list sebelumnya
 
-        // Pilih 3 item acak dari prefab yang ada di folder
-        for (int i = 0; i < 3; i++)
+        // Pilih itemCount item acak dari prefab yang ada di folder
+        for (int i = 0; i < itemCount; i++)
         {
             // Pilih item acak dari array prefab yang dimuat
             GameObject randomItem = (GameObject)items[Random.Range(0, items.Length)];
-            groceryList.Add(randomItem.name);  // Simpan nama item (misalnya: apple, banana)
+            string itemName = randomItem.name;
+
+            // Pastikan item yang sama tidak ditambahkan lagi ke dalam grocery list
+            if (!groceryList.Contains(itemName))  
+            {
+                groceryList.Add(itemName);  // Simpan nama item (misalnya: apple, banana)
+            }
+            else
+            {
+                // Jika item sudah ada, kurangi i agar jumlah item tetap sesuai dengan itemCount
+                i--;
+            }
         }
     }
 
     // Mengupdate UI grocery list dengan menambahkan strikethrough pada item yang sudah diambil
     void UpdateGroceryListUI()
     {
-        groceryListText.text = "";  // Menghapus semua teks sebelumnya
+        groceryListText.text = "";  // Bersihkan teks grocery list sebelumnya
         foreach (string item in groceryList)
         {
             if (capturedItems.Contains(item))
