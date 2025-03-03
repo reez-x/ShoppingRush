@@ -106,4 +106,10 @@ public class GroceryListManager : MonoBehaviour
         // Update UI setelah item ditandai
         UpdateGroceryListUI();
     }
+
+    // Fungsi untuk mengecek apakah item sudah dicoret dari grocery list
+    public bool IsItemCaptured(string itemName)
+    {
+        return capturedItems.Contains(itemName);  // Mengembalikan true jika item sudah dicoret
+    }
 }

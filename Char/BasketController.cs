@@ -459,8 +459,8 @@ public class BasketController : MonoBehaviour
             string itemName = collision.gameObject.name;
             itemName = itemName.Replace("(Clone)", "").Trim();  // Menghapus "(Clone)" jika ada
 
-            // Jika item ada di grocery list, tambah skor dan mainkan efek partikel yang sesuai
-            if (groceryListManager != null && groceryListManager.IsItemInGroceryList(itemName))
+            // Jika item ada di grocery list dan belum dicoret
+            if (groceryListManager != null && groceryListManager.IsItemInGroceryList(itemName) && !groceryListManager.IsItemCaptured(itemName))
             {
                 groceryListManager.AddScore(100);  // Tambah skor
                 groceryListManager.MarkItemAsCaptured(itemName);  // Tandai item yang ditangkap
@@ -468,7 +468,7 @@ public class BasketController : MonoBehaviour
             }
             else
             {
-                // Jika item tidak ada di grocery list, kurangi HP
+                // Jika item tidak ada di grocery list atau sudah dicoret, kurangi HP
                 ReduceHealth();
                 PlayWrongItemEffect();  // Mainkan efek partikel untuk item yang salah
             }
