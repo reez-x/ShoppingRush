@@ -236,9 +236,9 @@ using UnityEngine;
 
 public class CharacterMovement : MonoBehaviour
 {
-    public float moveSpeed = 5f; // Kecepatan pergerakan maksimum karakter
+    public float moveSpeed = 2f; // Kecepatan pergerakan maksimum karakter
     public float acceleration = 5f; // Akselerasi untuk pergerakan
-    public float deceleration = 5f; // Deselerasi normal untuk berhenti
+    public float deceleration = 3f; // Deselerasi normal untuk berhenti
     private float currentSpeed = 0f; // Kecepatan saat ini (diperbarui perlahan)
 
     private bool isMovingLeft = false;
@@ -325,9 +325,9 @@ public class CharacterMovement : MonoBehaviour
     private void AdjustMovementBasedOnLevel(int level)
     {
         // Semakin tinggi level, semakin cepat karakter bergerak
-        moveSpeed = 5f + level * 8f; // Contoh: menambah 0.5 ke moveSpeed per level
+        moveSpeed = 2f + level * 8f; // Contoh: menambah 0.5 ke moveSpeed per level
         acceleration = 5f + level * 3f; // Menambah akselerasi per level
-        deceleration = 5f + level * 3f; // Menambah deselerasi per level
+        deceleration = 3f + level * 3f; // Menambah deselerasi per level
         // // Semakin tinggi level, semakin cepat karakter bergerak
         // moveSpeed = 5f + level * 1f; // Contoh: menambah 0.5 ke moveSpeed per level
         // acceleration = 5f + level * 0.4f; // Menambah akselerasi per level
