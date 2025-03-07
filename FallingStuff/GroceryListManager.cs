@@ -14,47 +14,79 @@ public class GroceryListManager : MonoBehaviour
 
     public XPLevelManager xpLevelManager;  // Referensi ke XPLevelManager (Pastikan ini sudah ditambahkan di Inspector)
 
-    void Start()
-{
-    // Generate grocery list secara acak dan tampilkan di UI
-    GenerateGroceryList();
-    UpdateGroceryListUI();
-    UpdateScoreUI();  // Memperbarui UI untuk skor saat pertama kali dijalankan
-}
-
-void GenerateGroceryList()
-{
-    // Menghitung itemCount berdasarkan level saat ini
-    itemCount = 2 + xpLevelManager.GetCurrentLevel();  // Mulai dari 2 item pada level 0, dan bertambah 1 setiap level
-
-    // Ambil semua prefab di folder Resources/Prefabs
-    Object[] items = Resources.LoadAll("Prefabs", typeof(GameObject));  // Muat semua prefab dari folder Prefabs
-
-    groceryList.Clear();  // Kosongkan grocery list sebelumnya
-
-    // Pilih itemCount item acak dari prefab yang ada di folder
-    for (int i = 0; i < itemCount; i++)
+    // Kamus untuk mengubah nama item (misalnya "air_mineral" menjadi "Air Mineral")
+    private Dictionary<string, string> itemDisplayNames = new Dictionary<string, string>()
     {
-        // Pilih item acak dari array prefab yang dimuat
-        GameObject randomItem = (GameObject)items[Random.Range(0, items.Length)];
-        string itemName = randomItem.name;
+        { "air_mineral", "Air Mineral" },
+        { "apple", "Apple" },
+        { "banana", "Banana" },
+        { "avocado", "Alpukat" },
+        { "brokolli", "Brokolli" },
+        { "cabai", "Cabai" },
+        { "daging_ayam", "Daging Ayam" },
+        { "daging_sapi", "Daging Sapi" },
+        { "egg", "Telur" },
+        { "fish", "Ikan" },
+        { "garam", "Garam" },
+        { "gula", "Gula" },
+        { "jeruk", "Jeruk" },
+        { "kecap", "Kecap" },
+        { "kentang", "Kentang" },
+        { "kol", "Kol" },
+        { "labu", "Labu" },
+        { "mangga", "Mangga" },
+        { "masako", "Masako" },
+        { "paprika", "Paprika" },
+        { "pecin", "Pecin" },
+        { "semangka", "Semangka" },
+        { "soda", "Soda" },
+        { "strawberry", "Strawberry" },
+        { "susu", "Susu" },
+        { "terong", "Terong" },
+        { "tomato", "Tomat" },
+        // Tambahkan mapping lain sesuai dengan nama prefab Anda
+    };
 
-        // Pastikan item yang sama tidak ditambahkan lagi ke dalam grocery list
-        if (!groceryList.Contains(itemName))  
-        {
-            groceryList.Add(itemName);  // Simpan nama item (misalnya: apple, banana)
-        }
-        else
-        {
-            // Jika item sudah ada, kurangi i agar jumlah item tetap sesuai dengan itemCount
-            i--;
-        }
+    void Start()
+    {
+        // Generate grocery list secara acak dan tampilkan di UI
+        GenerateGroceryList();
+        UpdateGroceryListUI();
+        UpdateScoreUI();  // Memperbarui UI untuk skor saat pertama kali dijalankan
     }
 
-    // Debug: Tampilkan grocery list yang tergenerate ke console dalam satu log
-    Debug.Log("Grocery List Generated: " + GetGroceryListString());
-}
+    void GenerateGroceryList()
+    {
+        // Menghitung itemCount berdasarkan level saat ini
+        itemCount = 2 + xpLevelManager.GetCurrentLevel();  // Mulai dari 2 item pada level 0, dan bertambah 1 setiap level
 
+        // Ambil semua prefab di folder Resources/Prefabs
+        Object[] items = Resources.LoadAll("Prefabs", typeof(GameObject));  // Muat semua prefab dari folder Prefabs
+
+        groceryList.Clear();  // Kosongkan grocery list sebelumnya
+
+        // Pilih itemCount item acak dari prefab yang ada di folder
+        for (int i = 0; i < itemCount; i++)
+        {
+            // Pilih item acak dari array prefab yang dimuat
+            GameObject randomItem = (GameObject)items[Random.Range(0, items.Length)];
+            string itemName = randomItem.name;
+
+            // Pastikan item yang sama tidak ditambahkan lagi ke dalam grocery list
+            if (!groceryList.Contains(itemName))  
+            {
+                groceryList.Add(itemName);  // Simpan nama item (misalnya: apple, banana)
+            }
+            else
+            {
+                // Jika item sudah ada, kurangi i agar jumlah item tetap sesuai dengan itemCount
+                i--;
+            }
+        }
+
+        // Debug: Tampilkan grocery list yang tergenerate ke console dalam satu log
+        Debug.Log("Grocery List Generated: " + GetGroceryListString());
+    }
 
     // Fungsi untuk menggabungkan seluruh grocery list menjadi satu string
     string GetGroceryListString()
@@ -84,19 +116,35 @@ void GenerateGroceryList()
         groceryListText.text = "";  // Bersihkan teks grocery list sebelumnya
         foreach (string item in groceryList)
         {
+            string displayName = GetDisplayName(item);  // Ambil nama tampilan dari kamus
+
             if (capturedItems.Contains(item))
             {
                 // Menambahkan strikethrough jika item sudah diambil
-                groceryListText.text += "<s>" + item + "</s>\n";
+                groceryListText.text += "<s>" + displayName + "</s>\n";
             }
             else
             {
-                groceryListText.text += item + "\n";
+                groceryListText.text += displayName + "\n";
             }
         }
 
         // Debug: Update grocery list di konsol setelah ada item yang dicoret
         Debug.Log("Grocery List Updated: " + GetGroceryListString());
+    }
+
+    // Fungsi untuk mendapatkan nama yang bisa ditampilkan di UI
+    string GetDisplayName(string itemName)
+    {
+        if (itemDisplayNames.ContainsKey(itemName))
+        {
+            return itemDisplayNames[itemName];  // Kembalikan nama yang telah diubah
+        }
+        else
+        {
+            // Jika tidak ada di kamus, gunakan nama asli (nama prefab)
+            return itemName;
+        }
     }
 
     // Mengupdate UI skor
